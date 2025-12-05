@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = getUserFromRequest(request);
@@ -12,7 +12,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const product = db.products.getById(params.id);
+    const { id } = await params;
+    const product = db.products.getById(id);
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
@@ -32,7 +33,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = getUserFromRequest(request);
@@ -40,7 +41,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const product = db.products.getById(params.id);
+    const { id } = await params;
+    const product = db.products.getById(id);
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
@@ -51,7 +53,7 @@ export async function PUT(
 
     const { name, image, whatsappLink, instagramLink, categories } = await request.json();
 
-    const updatedProduct = db.products.update(params.id, {
+    const updatedProduct = db.products.update(id, {
       name,
       image,
       whatsappLink,
@@ -74,7 +76,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = getUserFromRequest(request);
@@ -82,7 +84,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const product = db.products.getById(params.id);
+    const { id } = await params;
+    const product = db.products.getById(id);
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
@@ -91,7 +94,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const deleted = db.products.delete(params.id);
+    const deleted = db.products.delete(id);
     if (!deleted) {
       return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
     }
